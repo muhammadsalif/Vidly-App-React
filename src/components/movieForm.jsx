@@ -1,0 +1,7 @@
+import React, { Component } from "react";
+
+const MovieForm = () => {
+  return <h1>Hello World</h1>;
+};
+
+export default MovieForm;
