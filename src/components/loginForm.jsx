@@ -4,7 +4,7 @@ import Input from "./common/input";
 
 class LoginForm extends Component {
   state = {
-    account: { username: " ", password: " " },
+    account: { username: "", password: "" },
     errors: {},
   };
 
