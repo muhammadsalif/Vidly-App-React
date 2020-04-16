@@ -7,7 +7,7 @@ import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
 import { getGenres } from "../services/fakeGenreService";
 import { paginate } from "../utils/paginate";
-// import Link from ""
+import SearchBox from "./searchBox";
 import _ from "lodash";
 
 class Movies extends Component {
@@ -16,6 +16,8 @@ class Movies extends Component {
     genres: [],
     currentPage: 1,
     pageSize: 4,
+    searchQuery: "",
+    selectedGenre: null,
     sortColumn: { path: "title", order: "asc" },
   };
 
@@ -44,8 +46,13 @@ class Movies extends Component {
   handleGenreSelect = (genre) => {
     this.setState({
       selectedGenre: genre,
+      searchQuery: "",
       currentPage: 1,
     });
+  };
+
+  handleSearch = (query) => {
+    this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
 
   handleSort = (sortColumn) => {
@@ -57,15 +64,19 @@ class Movies extends Component {
     const {
       pageSize,
       currentPage,
-      selectedGenre,
-      movies: allMovies,
       sortColumn,
+      selectedGenre,
+      searchQuery,
+      movies: allMovies,
     } = this.state;
 
-    const filtered =
-      selectedGenre && selectedGenre._id
-        ? allMovies.filter((m) => m.genre._id === selectedGenre._id)
-        : allMovies;
+    let filtered = allMovies;
+    if (searchQuery)
+      filtered = allMovies.filter((m) =>
+        m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    else if (selectedGenre && selectedGenre._id)
+      filtered = allMovies.filter((m) => m.genre._id === selectedGenre._id);
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
@@ -100,6 +111,10 @@ class Movies extends Component {
             New Movie
           </Link>
           <p>Showing result of {totalCount} movies from the database.</p>
+          <SearchBox
+            value={searchQuery}
+            onChange={this.handleSearch}
+          ></SearchBox>
           <MoviesTable
             movies={movies}
             onLike={this.handleLike}
